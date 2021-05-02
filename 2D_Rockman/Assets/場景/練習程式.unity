@@ -238,6 +238,9 @@ MonoBehaviour:
   obj2: {fileID: 927007160}
   tra: {fileID: 1169531067}
   spr: {fileID: 927007161}
+  number: 1
+  test: 0
+  prop: "\u7D05\u8272\u85E5\u6C34"
 --- !u!1 &1169531064
 GameObject:
   m_ObjectHideFlags: 0

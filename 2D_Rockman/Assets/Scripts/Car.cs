@@ -115,6 +115,17 @@ public class Car : MonoBehaviour
         // 傳回類型 名稱 = 傳回方法()；
         int t = Ten();
         print("傳回方法的結果：" + t);
+
+        Drive50();
+        Drive100();
+        Drive300();
+        // 呼叫方法要有相同數量的參數
+        // 有預設值得參數為【選填式參數】
+        Drive(200, "咻咻咻");
+        Drive(999, "轟轟轟", "爆炸特效");
+        // 有多個選填式參數
+        Drive(70, "閃電");                // 錯誤 - 把特效放在音效上
+        Drive(70, effect: "閃電");        // 正確 - 指定特效參數
     }
 
     // 更新事件執行時間點與次數：開始事件後以每秒約六十次執行 60FPS
@@ -128,7 +139,7 @@ public class Car : MonoBehaviour
     #region 方法 Unity Method、Function
     // 方法：保存較複雜或演算法的程式區塊
     // 語法：
-    // 修飾詞 傳回類型 名稱() { 較複雜或演算法的程式區塊 }
+    // 修飾詞 傳回類型 名稱(參數1，參數2，...，參數n) { 較複雜或演算法的程式區塊 }
     // void 無傳回：使用這個方法不會有傳回
     // 方法需要被【呼叫】才會執行
     /// <summary>
@@ -148,6 +159,42 @@ public class Car : MonoBehaviour
     private int Ten()
     {
         return 10;
+    }
+
+    // 舉例：
+    // 三個方法 1. 以時數 50 開車 2. 時數 100 3. 時數 300
+    // 加新功能 要有音效
+    // 加特效
+    private void Drive50()
+    {
+        print("開車時速：" + 50);
+        print("開車音效");
+    }
+    private void Drive100()
+    {
+        print("開車時速：" + 100);
+        print("開車音效");
+    }
+    private void Drive300()
+    {
+        print("開車時速：" + 300);
+        print("開車音效");
+    }
+
+    // 用參數解決 Paramater
+    // 參數語法：類型 參數名稱
+    /// <summary>
+    /// 開車
+    /// </summary>
+    /// <param name="speed">開車的時速</param>
+    /// <param name="sound">開車的音效</param>
+    /// <param name="effect">特效</param>
+    // 有預設值得參數只能寫在最右邊
+    private void Drive(int speed, string sound = "咻~", string effect = "灰塵效果")
+    {
+        print("開車時速：" + speed);
+        print("開車音效：" + sound);
+        print("特效：" + effect);
     }
     #endregion
 }
