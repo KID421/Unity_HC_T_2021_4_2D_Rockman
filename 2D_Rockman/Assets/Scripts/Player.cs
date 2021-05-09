@@ -3,11 +3,11 @@
 public class Player : MonoBehaviour
 {
     #region 欄位
-    [Header("移動速度"), Range(0, 1000)]
+    [Header("移動速度"), Range(0, 5000)]
     public float speed = 10.5f;
     [Header("跳躍高度"), Range(0, 3000)]
     public int jump = 100;
-    [Range(0, 200)]
+    [Header("血量"), Range(0, 200)]
     public float hp = 100;
     [Header("是否在地板上"), Tooltip("儲存角色是否在地板上")]
     public bool isGrounded;
@@ -26,6 +26,19 @@ public class Player : MonoBehaviour
     #endregion
 
     #region 事件
+    private void Start()
+    {
+        // 利用程式取得元件
+        // 傳回元件 取得元件<元件名稱>() - <泛型>
+        // 取得跟此腳本同一層的元件
+        rig = GetComponent<Rigidbody2D>();
+    }
+
+    // 一秒約執行 60 次
+    private void Update()
+    {
+        Move();
+    }
     #endregion
 
     #region 方法
@@ -34,7 +47,13 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Move()
     {
+        // 1. 要抓到玩家按下左右鍵的資訊 Input
+        float h = Input.GetAxis("Horizontal");
 
+        // 2. 使用左右鍵的資訊控制角色移動
+        // 剛體.加速度 = 二維向量(水平 * 速度 * 一幀的時間，指定回原本的 Y 軸加速度)
+        // 一幀的時間 - 解決不同效能的裝置速度差問題
+        rig.velocity = new Vector2(h * speed * Time.deltaTime, rig.velocity.y);
     }
 
     /// <summary>
@@ -42,7 +61,8 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Jump()
     {
-
+        // 如果 玩家 按下 空白鍵 就 往上跳躍
+        // 判斷式 C# 
     }
 
     /// <summary>
