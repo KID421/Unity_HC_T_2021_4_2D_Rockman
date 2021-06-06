@@ -32,6 +32,8 @@ public class Player : MonoBehaviour
         // 傳回元件 取得元件<元件名稱>() - <泛型>
         // 取得跟此腳本同一層的元件
         rig = GetComponent<Rigidbody2D>();
+        ani = GetComponent<Animator>();
+        aud = GetComponent<AudioSource>();
     }
 
     // 一秒約執行 60 次
@@ -39,6 +41,7 @@ public class Player : MonoBehaviour
     {
         Move();
         Jump();
+        Fire();
     }
 
     [Header("判斷地板碰撞的位移與半徑")]
@@ -84,6 +87,12 @@ public class Player : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0, 180, 0);
         }
+
+        // 設定動畫
+        // 水平值 不等於 零 布林值 打勾
+        // 水平值 等於 零 布林值 取消
+        // 不等於 !=
+        ani.SetBool("走路開關", h != 0);
     }
 
     /// <summary>
@@ -133,7 +142,12 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Fire()
     {
-
+        // 如果 玩家按下左鍵 就開槍 - 動畫與音效 發射子彈
+        if (Input.GetKeyDown(KeyCode.Mouse0))
+        {
+            ani.SetTrigger("攻擊觸發");
+            aud.PlayOneShot(bulletSound, 0.5f);
+        }
     }
 
     /// <summary>
