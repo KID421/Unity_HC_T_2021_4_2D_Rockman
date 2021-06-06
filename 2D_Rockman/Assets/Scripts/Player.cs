@@ -52,7 +52,11 @@ public class Player : MonoBehaviour
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         // 2. 繪製圖形
         // transform 可以抓到此腳本同一層的變形元件
-        Gizmos.DrawSphere(transform.position + groundOffset, groundRadius);
+        // 繪製球體(中心點，半徑)
+        // 物件的右方 X 軸：transform.right
+        // 物件的右方 Y 軸：transform.up
+        // 物件的右方 Z 軸：transform.forward
+        Gizmos.DrawSphere(transform.position + transform.right * groundOffset.x + transform.up * groundOffset.y, groundRadius);
     }
     #endregion
 
@@ -69,6 +73,17 @@ public class Player : MonoBehaviour
         // 剛體.加速度 = 二維向量(水平 * 速度 * 一幀的時間，指定回原本的 Y 軸加速度)
         // 一幀的時間 - 解決不同效能的裝置速度差問題
         rig.velocity = new Vector2(h * speed * Time.deltaTime, rig.velocity.y);
+
+        // 如果 按下 D 面向右邊 0 0 0
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            transform.eulerAngles = Vector3.zero;
+        }
+        // 否則 如果 按下 A 面向左邊 0 180 0
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
     }
 
     /// <summary>
@@ -76,13 +91,40 @@ public class Player : MonoBehaviour
     /// </summary>
     private void Jump()
     {
-        // 如果 玩家 按下 空白鍵 就 往上跳躍
+        // 如果 玩家 按下 空白鍵 並且 在地板上 就 往上跳躍
         // 判斷式 C# 
         // 傳回值為布林值的方法可以當成布林值使用
-        if (Input.GetKeyDown(KeyCode.Space))
+        // ※ 判斷布林值是否等於 true 寫法
+        // 1. isGrounded == true (原本寫法)
+        // 2. isGrounded (簡寫)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             // 剛體.添加推力(二維向量)
             rig.AddForce(new Vector2(0, jump));
+        }
+
+        // 碰到的物件 = 2D 物理.覆蓋圓形(中心點，半徑，圖層)
+        // 圖層語法：1 << 圖層編號 (LayerMask int)
+        Collider2D hit = Physics2D.OverlapCircle(transform.position + transform.right * groundOffset.x + transform.up * groundOffset.y, groundRadius, 1 << 8);
+
+        // print("碰到的物件：" + hit.name);
+
+        // 如果 碰到的物件 存在 並且 碰到的物件名稱 等於 地板 就代表在地板上
+        // 並且 && (Shift + 7)
+        // 等於 ==
+        // 或者 || (Shift + \ 鎮)
+        // 或者 名稱 等於 跳台
+
+        if (hit && (hit.name == "地板" || hit.name == "跳台"))
+        {
+            isGrounded = true;
+        }
+        // 否則 不在地板上
+        // 否則 else
+        // 語法： else { 程式區塊 } - 僅能寫在 if 下方
+        else
+        {
+            isGrounded = false;
         }
     }
 

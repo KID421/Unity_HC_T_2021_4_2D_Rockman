@@ -272,7 +272,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 46146737}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.85079646, y: -3.163167, z: 0}
+  m_LocalPosition: {x: 4.89, y: -3.163167, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -566,7 +566,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 2
   m_Material: {fileID: 0}
   m_Interpolate: 0
   m_SleepingMode: 1
@@ -600,8 +600,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c60b8f824ae64a4499134b85343c4e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2000
-  jump: 300
+  speed: 350
+  jump: 650
   hp: 100
   isGrounded: 0
   bullet: {fileID: 0}
@@ -625,7 +625,7 @@ GameObject:
   - component: {fileID: 212304813}
   - component: {fileID: 212304812}
   - component: {fileID: 212304815}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: "\u8DF3\u53F0"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1490,7 +1490,7 @@ PlatformEffector2D:
   m_RotationalOffset: 0
   m_UseOneWay: 1
   m_UseOneWayGrouping: 0
-  m_SurfaceArc: 180
+  m_SurfaceArc: 145
   m_UseSideFriction: 0
   m_UseSideBounce: 0
   m_SideArc: 1
@@ -7559,7 +7559,7 @@ GameObject:
   - component: {fileID: 2118841123}
   - component: {fileID: 2118841122}
   - component: {fileID: 2118841121}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: "\u5730\u677F"
   m_TagString: Untagged
   m_Icon: {fileID: 0}
