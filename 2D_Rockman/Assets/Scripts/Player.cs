@@ -13,16 +13,20 @@ public class Player : MonoBehaviour
     public bool isGrounded;
     [Header("子彈"), Tooltip("角色要發射的子彈物件")]
     public GameObject bullet;
-    [Header("子彈生成點"), Tooltip("生成子彈的位置")]
-    public Transform bulletPoint;
-    [Range(0, 5000)]
+    [Header("子彈速度"), Range(0, 5000)]
     public int bulletSpeed = 800;
     [Header("開槍音效"), Tooltip("開槍的聲音")]
     public AudioClip bulletSound;
+    [Header("判斷地板碰撞的位移與半徑")]
+    public Vector3 groundOffset;
+    public float groundRadius = 0.2f;
+    [Header("子彈生成位置")]
+    public Vector3 posBullet;
 
     private AudioSource aud;
     private Rigidbody2D rig;
     private Animator ani;
+    private ParticleSystem ps;
     #endregion
 
     #region 事件
@@ -34,6 +38,12 @@ public class Player : MonoBehaviour
         rig = GetComponent<Rigidbody2D>();
         ani = GetComponent<Animator>();
         aud = GetComponent<AudioSource>();
+
+        // 粒子系統 = 變形元件.搜尋子物件("子物件名稱")
+        ps = transform.Find("集氣特效").GetComponent<ParticleSystem>();
+
+        // 2D 物理.忽略圖層碰撞(圖層1，圖層2，是否要忽略)
+        Physics2D.IgnoreLayerCollision(9, 10, true);
     }
 
     // 一秒約執行 60 次
@@ -44,10 +54,6 @@ public class Player : MonoBehaviour
         Fire();
     }
 
-    [Header("判斷地板碰撞的位移與半徑")]
-    public Vector3 groundOffset;
-    public float groundRadius = 0.2f;
-
     // 繪製圖示 - 輔助編輯時的圖形線條
     private void OnDrawGizmos()
     {
@@ -57,9 +63,13 @@ public class Player : MonoBehaviour
         // transform 可以抓到此腳本同一層的變形元件
         // 繪製球體(中心點，半徑)
         // 物件的右方 X 軸：transform.right
-        // 物件的右方 Y 軸：transform.up
-        // 物件的右方 Z 軸：transform.forward
+        // 物件的上方 Y 軸：transform.up
+        // 物件的前方 Z 軸：transform.forward
         Gizmos.DrawSphere(transform.position + transform.right * groundOffset.x + transform.up * groundOffset.y, groundRadius);
+
+        // 先指定顏色在畫圖型
+        Gizmos.color = new Color(0.3f, 0.9f, 0.9f, 0.8f);
+        Gizmos.DrawSphere(transform.position + transform.right * posBullet.x + transform.up * posBullet.y, 0.1f);
     }
     #endregion
 
@@ -138,6 +148,11 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
+    /// 紀錄按住左鍵的計時器
+    /// </summary>
+    private float timer;
+
+    /// <summary>
     /// 開槍
     /// </summary>
     private void Fire()
@@ -146,7 +161,49 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.Mouse0))
         {
             ani.SetTrigger("攻擊觸發");
-            aud.PlayOneShot(bulletSound, 0.5f);
+            ps.Play();                              // 播放集氣
+        }
+        // 否則如果
+        // else if (布林值) { 程式區塊 }
+        // 按住左鍵
+        else if (Input.GetKey(KeyCode.Mouse0))
+        {
+            // 累加 +=
+            timer += Time.deltaTime;
+            // print("按住左鍵的時間：" + timer);
+        }
+        // 放開左鍵
+        else if (Input.GetKeyUp(KeyCode.Mouse0))
+        {
+            ps.Stop();                              // 停止集氣
+            aud.PlayOneShot(bulletSound, 1f);
+
+            // Object.Instantiate(bullet);  // 原始寫法
+
+            // 暫存物件 = 生成(物件，座標，角度)
+            // Quaternion 四位元 - 角度
+            // Quaternion.identity 零角度
+            GameObject temp = Instantiate(bullet, transform.position + transform.right * posBullet.x + transform.up * posBullet.y, Quaternion.identity);            // 簡寫
+            // 暫存物件.取得元件<2D 剛體>().添加推力(角色前方 * 子彈速度)
+            temp.GetComponent<Rigidbody2D>().AddForce(transform.right * bulletSpeed);
+            // 刪除(物件，延遲秒數)
+            Destroy(temp, 2f);
+
+            // 讓子彈的角度跟玩家目前的角度相同 - 子彈角度問題
+            // 取得粒子的渲染元件
+            ParticleSystemRenderer render = temp.GetComponent<ParticleSystemRenderer>();
+            // 渲染的翻面 = 角色的角度 - ? : 三元運算子
+            render.flip = new Vector3(transform.eulerAngles.y == 0 ? 0 : 1, 0, 0);
+
+            // 計時器 = 數學.夾住(計時器，最小，最大)
+            timer = Mathf.Clamp(timer, 0, 5);
+
+            // 集氣：調整子彈尺寸
+            // temp.transform.lossyScale = Vector3.one; // lossyScale 為唯讀 Read Only - 不能指定值 - 此行為錯誤示範 會出現紅色蚯蚓
+            temp.transform.localScale = Vector3.one + Vector3.one * timer;
+
+            // 計時器歸零
+            timer = 0;
         }
     }
 
