@@ -1,4 +1,7 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;               // 引用 介面 API
+using UnityEngine.SceneManagement;
+using System.Collections;           // 引用 系統.集合 API - 集合與協同程序
 
 public class Player : MonoBehaviour
 {
@@ -22,6 +25,7 @@ public class Player : MonoBehaviour
     public float groundRadius = 0.2f;
     [Header("子彈生成位置")]
     public Vector3 posBullet;
+    
 
     private AudioSource aud;
     private Rigidbody2D rig;
@@ -35,11 +39,27 @@ public class Player : MonoBehaviour
     /// 攻擊力
     /// </summary>
     private float attack = 10;
+    /// <summary>
+    /// 圖片：血條
+    /// </summary>
+    private Image imgHp;
+    /// <summary>
+    /// 文字：生命
+    /// </summary>
+    private Text textHp;
+    private float hpMax;
+
     #endregion
 
     #region 事件
+    /// <summary>
+    /// 結束畫面
+    /// </summary>
+    private CanvasGroup groupFinal;
+
     private void Start()
     {
+        #region 取得資料
         // 利用程式取得元件
         // 傳回元件 取得元件<元件名稱>() - <泛型>
         // 取得跟此腳本同一層的元件
@@ -52,6 +72,16 @@ public class Player : MonoBehaviour
 
         // 2D 物理.忽略圖層碰撞(圖層1，圖層2，是否要忽略)
         Physics2D.IgnoreLayerCollision(9, 10, true);
+        #endregion
+        // 遊戲物件.尋找("物件名稱 - 絕對不要有相同的名稱")
+        // 絕對不要在 Update 系列事件內使用
+        // 不能尋找隱藏物件 會導致錯誤
+        imgHp = GameObject.Find("血條").GetComponent<Image>();
+        textHp = GameObject.Find("生命").GetComponent<Text>();
+        textHp.text = life.ToString();
+        hpMax = hp;
+
+        groupFinal = GameObject.Find("結束畫面").GetComponent<CanvasGroup>();
     }
 
     // 一秒約執行 60 次
@@ -224,8 +254,15 @@ public class Player : MonoBehaviour
     public void Hit(float damage)
     {
         hp -= damage;
+        imgHp.fillAmount = hp / hpMax;      // 圖片.長度 = 血量 / 血量最大值
+
         if (hp <= 0) Dead();
     }
+
+    // 靜態 static
+    // 1. 靜態欄位重新載入後不會還原為預設值
+    // 2. 靜態欄位不會顯示在屬性面板上
+    public static int life = 3;
 
     /// <summary>
     /// 死亡
@@ -233,8 +270,39 @@ public class Player : MonoBehaviour
     /// <returns>是否死亡</returns>
     private bool Dead()
     {
-        ani.SetBool("死亡開關", hp <= 0);
+        // 如果 尚未死亡 並且 血量 低於等於 零 才可以執行 死亡
+        if (!ani.GetBool("死亡開關") && hp <= 0)
+        {
+            ani.SetBool("死亡開關", hp <= 0);
+            life--;                             // 生命遞減
+            textHp.text = life.ToString();      // 更新生命數量
+            
+            if (life >= 0) Invoke("Replay", 2f);    // 如果 生命 大於等於 0 就 重新遊戲
+            else StartCoroutine(GameOver());        // 否則 就 啟動協同程序 遊戲結束
+        }
+        
         return hp <= 0;
+    }
+
+    // IEnumerator 允許傳回時間 必須有 yield 讓步
+    private IEnumerator GameOver()
+    {
+        while (groupFinal.alpha < 1)                    // 當 透明度 < 1 時 執行
+        {
+            groupFinal.alpha += 0.05f;                  // 遞增透明度 0.05
+            yield return new WaitForSeconds(0.02f);     // 間隔 0.02 秒
+        }
+
+        groupFinal.interactable = true;                 // 允許 互動
+        groupFinal.blocksRaycasts = true;               // 允許 滑鼠遮擋
+    }
+
+    /// <summary>
+    /// 重新遊戲
+    /// </summary>
+    private void Replay()
+    {
+        SceneManager.LoadScene("遊戲畫面");
     }
 
     /// <summary>
