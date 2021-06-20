@@ -46,8 +46,13 @@ public class Enemy : MonoBehaviour
         speedOriginal = speed;      // 取得原始速度
     }
 
+    [Header("攻擊區域位移與尺寸")]
+    public Vector3 attackOffset;
+    public Vector3 attackSize;
+
     private void OnDrawGizmos()
     {
+        #region 繪製距離與檢查地板
         Gizmos.color = new Color(0, 1, 0, 0.3f);
         Gizmos.DrawSphere(transform.position, radiusTrack);
 
@@ -56,6 +61,12 @@ public class Enemy : MonoBehaviour
 
         Gizmos.color = new Color(0.6f, 0.9f, 1, 0.7f);
         Gizmos.DrawSphere(transform.position + transform.right * groundOffset.x + transform.up * groundOffset.y, groundRadius);
+        #endregion
+
+        #region 繪製攻擊區域
+        Gizmos.color = new Color(0.3f, 0.3f, 1, 0.8f);
+        Gizmos.DrawCube(transform.position + transform.right * attackOffset.x + transform.up * attackOffset.y, attackSize);
+        #endregion
     }
 
     private void Update()
@@ -112,6 +123,10 @@ public class Enemy : MonoBehaviour
         {
             timer = 0;
             ani.SetTrigger("攻擊觸發");
+            // 碰撞物件 = 2D 物理.覆蓋盒形(中心點，尺寸，角度)
+            Collider2D hit = Physics2D.OverlapBox(transform.position + transform.right * attackOffset.x + transform.up * attackOffset.y, attackSize, 0);
+            // 如果 碰撞物件存在 並且 名稱是玩家 就對玩家 呼叫 受傷 方法
+            if (hit && hit.name == "玩家") hit.GetComponent<Player>().Hit(attack);
         }
     }
 

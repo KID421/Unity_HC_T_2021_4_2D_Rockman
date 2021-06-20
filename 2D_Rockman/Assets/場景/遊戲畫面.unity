@@ -320,6 +320,8 @@ MonoBehaviour:
   radiusAttack: 2
   groundOffset: {x: 2, y: -0.9, z: 0}
   groundRadius: 0.2
+  attackOffset: {x: 1.2, y: 0.3, z: 0}
+  attackSize: {x: 1, y: 2, z: 0.1}
 --- !u!70 &46146742
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -662,9 +664,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c60b8f824ae64a4499134b85343c4e9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 350
+  speed: 500
   jump: 650
-  hp: 100
+  hp: 0
   isGrounded: 0
   bullet: {fileID: 6119272959606810864, guid: 74126d6cf551c6443863bc17ee3484ed, type: 3}
   bulletSpeed: 400

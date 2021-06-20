@@ -27,6 +27,14 @@ public class Player : MonoBehaviour
     private Rigidbody2D rig;
     private Animator ani;
     private ParticleSystem ps;
+    /// <summary>
+    /// 紀錄按住左鍵的計時器
+    /// </summary>
+    private float timer;
+    /// <summary>
+    /// 攻擊力
+    /// </summary>
+    private float attack = 10;
     #endregion
 
     #region 事件
@@ -49,6 +57,8 @@ public class Player : MonoBehaviour
     // 一秒約執行 60 次
     private void Update()
     {
+        if (Dead()) return;
+
         Move();
         Jump();
         Fire();
@@ -148,15 +158,6 @@ public class Player : MonoBehaviour
     }
 
     /// <summary>
-    /// 紀錄按住左鍵的計時器
-    /// </summary>
-    private float timer;
-    /// <summary>
-    /// 攻擊力
-    /// </summary>
-    private float attack = 10;
-
-    /// <summary>
     /// 開槍
     /// </summary>
     private void Fire()
@@ -220,9 +221,10 @@ public class Player : MonoBehaviour
     /// 受傷
     /// </summary>
     /// <param name="damage">造成的傷害</param>
-    private void Hit(float damage)
+    public void Hit(float damage)
     {
-
+        hp -= damage;
+        if (hp <= 0) Dead();
     }
 
     /// <summary>
@@ -231,7 +233,8 @@ public class Player : MonoBehaviour
     /// <returns>是否死亡</returns>
     private bool Dead()
     {
-        return false;
+        ani.SetBool("死亡開關", hp <= 0);
+        return hp <= 0;
     }
 
     /// <summary>
