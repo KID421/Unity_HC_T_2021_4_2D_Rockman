@@ -70,6 +70,9 @@ public class Enemy : MonoBehaviour
     /// </summary>
     private void Move()
     {
+        // 如果 死亡 就 跳出
+        if (ani.GetBool("死亡開關")) return;
+
         // 距離 = 三維向量.距離(A 點，B 點)
         float dis = Vector3.Distance(player.position, transform.position);
 
@@ -147,6 +150,10 @@ public class Enemy : MonoBehaviour
     private void Dead()
     {
         ani.SetBool("死亡開關", true);
+        rig.Sleep();                                            // 剛體 睡著 - 避免飄移
+        rig.constraints = RigidbodyConstraints2D.FreezeAll;     // 剛體 凍結全部
+        GetComponent<CapsuleCollider2D>().enabled = false;      // 碰撞器 關閉
+        Destroy(gameObject, 2);                                 // 刪除
     }
 
     /// <summary>

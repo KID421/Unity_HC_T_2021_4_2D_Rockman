@@ -204,8 +204,8 @@ public class Player : MonoBehaviour
             // 計時器 = 數學.夾住(計時器，最小，最大)
             timer = Mathf.Clamp(timer, 0, 5);
 
-            // 子彈的攻擊力 = 攻擊力 加上 四捨五入(計時器) * 2
-            temp.GetComponent<Bullet>().attack = attack + Mathf.Round(timer) * 2;
+            // 子彈的攻擊力 = 攻擊力 加上 四捨五入(計時器) * 4
+            temp.GetComponent<Bullet>().attack = attack + (Mathf.Round(timer) + 5) * 4;
 
             // 集氣：調整子彈尺寸
             // temp.transform.lossyScale = Vector3.one; // lossyScale 為唯讀 Read Only - 不能指定值 - 此行為錯誤示範 會出現紅色蚯蚓
