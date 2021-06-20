@@ -140,5 +140,25 @@ public class Enemy : MonoBehaviour
         if (hit && (hit.name == "地板" || hit.name == "跳台")) speed = speedOriginal;
         else speed = 0;
     }
+
+    /// <summary>
+    /// 死亡
+    /// </summary>
+    private void Dead()
+    {
+        ani.SetBool("死亡開關", true);
+    }
+
+    /// <summary>
+    /// 受傷
+    /// </summary>
+    /// <param name="damage">接收到的傷害</param>
+    public void Hit(float damage)
+    {
+        hp -= damage;
+
+        // 判斷式 只有一個分號 可以省略 大括號
+        if (hp <= 0) Dead();
+    }
     #endregion
 }
