@@ -25,7 +25,11 @@ public class Player : MonoBehaviour
     public float groundRadius = 0.2f;
     [Header("子彈生成位置")]
     public Vector3 posBullet;
-    
+
+    // 靜態 static
+    // 1. 靜態欄位重新載入後不會還原為預設值
+    // 2. 靜態欄位不會顯示在屬性面板上
+    public static int life = 3;
 
     private AudioSource aud;
     private Rigidbody2D rig;
@@ -48,15 +52,13 @@ public class Player : MonoBehaviour
     /// </summary>
     private Text textHp;
     private float hpMax;
-
-    #endregion
-
-    #region 事件
     /// <summary>
     /// 結束畫面
     /// </summary>
     private CanvasGroup groupFinal;
+    #endregion
 
+    #region 事件
     private void Start()
     {
         #region 取得資料
@@ -110,6 +112,11 @@ public class Player : MonoBehaviour
         // 先指定顏色在畫圖型
         Gizmos.color = new Color(0.3f, 0.9f, 0.9f, 0.8f);
         Gizmos.DrawSphere(transform.position + transform.right * posBullet.x + transform.up * posBullet.y, 0.1f);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        EatProp(collision.gameObject);
     }
     #endregion
 
@@ -259,11 +266,6 @@ public class Player : MonoBehaviour
         if (hp <= 0) Dead();
     }
 
-    // 靜態 static
-    // 1. 靜態欄位重新載入後不會還原為預設值
-    // 2. 靜態欄位不會顯示在屬性面板上
-    public static int life = 3;
-
     /// <summary>
     /// 死亡
     /// </summary>
@@ -309,9 +311,20 @@ public class Player : MonoBehaviour
     /// 吃道具
     /// </summary>
     /// <param name="prop">道具的名稱</param>
-    private void EatProp(string prop)
+    private void EatProp(GameObject prop)
     {
+        if (prop.tag == "道具")
+        {
+            // 字串 API Remove(編號)，刪除包含指定編號後面的字串
+            // print(prop.name.Remove(2));
 
+            switch (prop.name.Remove(2))
+            {
+                case "補血":
+                    print("玩家恢復血量~");
+                    break;
+            }
+        }
     }
     #endregion
 }

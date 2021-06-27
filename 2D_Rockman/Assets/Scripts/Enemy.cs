@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TMPro;
+using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
@@ -18,6 +19,13 @@ public class Enemy : MonoBehaviour
     [Header("偵測地板的位移與半徑")]
     public Vector3 groundOffset;
     public float groundRadius = 0.1f;
+    [Header("攻擊區域位移與尺寸")]
+    public Vector3 attackOffset;
+    public Vector3 attackSize;
+    [Header("掉落道具")]
+    public GameObject prop;
+    [Header("掉落機率"), Range(0f, 1f)]
+    public float propProbility = 0.5f;
 
     private Animator ani;
     private Rigidbody2D rig;
@@ -45,10 +53,6 @@ public class Enemy : MonoBehaviour
         timer = cd;                 // 讓敵人一開始就進行攻擊
         speedOriginal = speed;      // 取得原始速度
     }
-
-    [Header("攻擊區域位移與尺寸")]
-    public Vector3 attackOffset;
-    public Vector3 attackSize;
 
     private void OnDrawGizmos()
     {
@@ -169,6 +173,17 @@ public class Enemy : MonoBehaviour
         rig.constraints = RigidbodyConstraints2D.FreezeAll;     // 剛體 凍結全部
         GetComponent<CapsuleCollider2D>().enabled = false;      // 碰撞器 關閉
         Destroy(gameObject, 2);                                 // 刪除
+        Prop();
+    }
+
+    /// <summary>
+    /// 掉落道具
+    /// </summary>
+    private void Prop()
+    {
+        float r = Random.value;         // 取得隨機值 0 ~ 1
+
+        if (r <= propProbility) Instantiate(prop, transform.position, Quaternion.identity);
     }
 
     /// <summary>

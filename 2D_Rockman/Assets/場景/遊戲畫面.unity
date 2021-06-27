@@ -400,6 +400,8 @@ MonoBehaviour:
   groundRadius: 0.2
   attackOffset: {x: 1.2, y: 0.3, z: 0}
   attackSize: {x: 1, y: 2, z: 0.1}
+  prop: {fileID: 286721464292635177, guid: bc654fa0fa736ec4aace6206444a99ff, type: 3}
+  propProbility: 1
 --- !u!70 &46146742
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -745,7 +747,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 500
   jump: 650
-  hp: 10
+  hp: 200
   isGrounded: 0
   bullet: {fileID: 6119272959606810864, guid: 74126d6cf551c6443863bc17ee3484ed, type: 3}
   bulletSpeed: 400
