@@ -59,6 +59,11 @@ public class Player : MonoBehaviour
     #endregion
 
     #region 事件
+    /// <summary>
+    /// 結束標題
+    /// </summary>
+    private Text textFinalTitle;
+
     private void Start()
     {
         #region 取得資料
@@ -74,7 +79,7 @@ public class Player : MonoBehaviour
 
         // 2D 物理.忽略圖層碰撞(圖層1，圖層2，是否要忽略)
         Physics2D.IgnoreLayerCollision(9, 10, true);
-        #endregion
+
         // 遊戲物件.尋找("物件名稱 - 絕對不要有相同的名稱")
         // 絕對不要在 Update 系列事件內使用
         // 不能尋找隱藏物件 會導致錯誤
@@ -82,8 +87,10 @@ public class Player : MonoBehaviour
         textHp = GameObject.Find("生命").GetComponent<Text>();
         textHp.text = life.ToString();
         hpMax = hp;
+        #endregion
 
         groupFinal = GameObject.Find("結束畫面").GetComponent<CanvasGroup>();
+        textFinalTitle = GameObject.Find("結束標題").GetComponent<Text>();
     }
 
     // 一秒約執行 60 次
@@ -94,6 +101,12 @@ public class Player : MonoBehaviour
         Move();
         Jump();
         Fire();
+    }
+
+    // 一秒固定 50 次
+    private void FixedUpdate()
+    {
+        MoveFixed();
     }
 
     // 繪製圖示 - 輔助編輯時的圖形線條
@@ -118,21 +131,46 @@ public class Player : MonoBehaviour
     {
         EatProp(collision.gameObject);
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.name == "死亡區域") hp = 0;
+    }
+
+    // 與粒子碰撞會執行的事件
+    // 1. 要有碰撞器
+    // 2. 粒子設定
+    // 2-1. Collision 勾選
+    // 2-2. 類型 Type：World
+    // 2-3. 模式 Mode：2D
+    // 2-4. 勾選傳送訊息 Send Collision Messages
+    private void OnParticleCollision(GameObject other)
+    {
+        Hit(other.GetComponent<ParticleSystemData>().attack);
+    }
     #endregion
 
     #region 方法
+    /// <summary>
+    /// 物理移動
+    /// </summary>
+    private void MoveFixed()
+    {
+        // 2. 使用左右鍵的資訊控制角色移動
+        // 剛體.加速度 = 二維向量(水平 * 速度 * 一幀的時間，指定回原本的 Y 軸加速度)
+        // 一幀的時間 - 解決不同效能的裝置速度差問題
+        rig.velocity = new Vector2(h * speed * Time.deltaTime, rig.velocity.y);
+    }
+
+    private float h;
+
     /// <summary>
     /// 移動
     /// </summary>
     private void Move()
     {
         // 1. 要抓到玩家按下左右鍵的資訊 Input
-        float h = Input.GetAxis("Horizontal");
-
-        // 2. 使用左右鍵的資訊控制角色移動
-        // 剛體.加速度 = 二維向量(水平 * 速度 * 一幀的時間，指定回原本的 Y 軸加速度)
-        // 一幀的時間 - 解決不同效能的裝置速度差問題
-        rig.velocity = new Vector2(h * speed * Time.deltaTime, rig.velocity.y);
+        h = Input.GetAxis("Horizontal");
 
         // 如果 按下 D 面向右邊 0 0 0
         if (Input.GetKeyDown(KeyCode.D))
@@ -287,8 +325,10 @@ public class Player : MonoBehaviour
     }
 
     // IEnumerator 允許傳回時間 必須有 yield 讓步
-    private IEnumerator GameOver()
+    public IEnumerator GameOver(string finalTitle = "GameOver")
     {
+        textFinalTitle.text = finalTitle;
+
         while (groupFinal.alpha < 1)                    // 當 透明度 < 1 時 執行
         {
             groupFinal.alpha += 0.05f;                  // 遞增透明度 0.05
@@ -321,9 +361,13 @@ public class Player : MonoBehaviour
             switch (prop.name.Remove(2))
             {
                 case "補血":
-                    print("玩家恢復血量~");
+                    hp += 30;
+                    hp = Mathf.Clamp(hp, 0, hpMax);
+                    imgHp.fillAmount = hp / hpMax;
                     break;
             }
+
+            Destroy(prop);
         }
     }
     #endregion

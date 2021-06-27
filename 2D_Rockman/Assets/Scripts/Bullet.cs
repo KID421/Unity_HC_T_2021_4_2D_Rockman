@@ -11,6 +11,8 @@ public class Bullet : MonoBehaviour
     {
         // 讓子彈彼此不要互相碰撞
         Physics2D.IgnoreLayerCollision(10, 10, true);
+        // 讓子彈與道具不要互相碰撞
+        Physics2D.IgnoreLayerCollision(10, 11, true);
     }
 
     // 碰撞事件

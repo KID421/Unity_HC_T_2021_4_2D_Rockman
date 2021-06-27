@@ -10,7 +10,7 @@ public class Enemy : MonoBehaviour
     public float attack = 10f;
     [Header("攻擊冷卻"), Range(0, 30)]
     public float cd = 3;
-    [Header("血量"), Range(0, 500)]
+    [Header("血量"), Range(0, 5000)]
     public float hp = 200f;
     [Header("追蹤範圍"), Range(0, 50)]
     public float radiusTrack = 5;
@@ -27,21 +27,22 @@ public class Enemy : MonoBehaviour
     [Header("掉落機率"), Range(0f, 1f)]
     public float propProbility = 0.5f;
 
-    private Animator ani;
     private Rigidbody2D rig;
-    private Transform player;
-    /// <summary>
-    /// 計時器：紀錄攻擊冷卻
-    /// </summary>
-    private float timer;
     /// <summary>
     /// 原始速度
     /// </summary>
     private float speedOriginal;
+
+    protected Transform player;
+    protected Animator ani;
+    /// <summary>
+    /// 計時器：紀錄攻擊冷卻
+    /// </summary>
+    protected float timer;
     #endregion
 
     #region 事件
-    private void Start()
+    protected virtual void Start()
     {
         ani = GetComponent<Animator>();
         rig = GetComponent<Rigidbody2D>();
@@ -95,6 +96,7 @@ public class Enemy : MonoBehaviour
         if (dis <= radiusAttack)
         {
             Attack();
+            LookAtPlayer();
         }
         // 否則 如果 玩家跟敵人 的 距離 小於等於 追蹤範圍 就移動
         else if (dis <= radiusTrack)
@@ -123,15 +125,20 @@ public class Enemy : MonoBehaviour
             timer += Time.deltaTime;
         }
         // 否則 攻擊 並將計時器歸零
-        else
-        {
-            timer = 0;
-            ani.SetTrigger("攻擊觸發");
-            // 碰撞物件 = 2D 物理.覆蓋盒形(中心點，尺寸，角度)
-            Collider2D hit = Physics2D.OverlapBox(transform.position + transform.right * attackOffset.x + transform.up * attackOffset.y, attackSize, 0);
-            // 如果 碰撞物件存在 並且 名稱是玩家 就對玩家 呼叫 受傷 方法
-            if (hit && hit.name == "玩家") hit.GetComponent<Player>().Hit(attack);
-        }
+        else AttackState();
+    }
+
+    /// <summary>
+    /// 攻擊狀態 - 根據階段選擇要攻擊的方式
+    /// </summary>
+    protected virtual void AttackState()
+    {
+        timer = 0;
+        ani.SetTrigger("攻擊觸發");
+        // 碰撞物件 = 2D 物理.覆蓋盒形(中心點，尺寸，角度)
+        Collider2D hit = Physics2D.OverlapBox(transform.position + transform.right * attackOffset.x + transform.up * attackOffset.y, attackSize, 0);
+        // 如果 碰撞物件存在 並且 名稱是玩家 就對玩家 呼叫 受傷 方法
+        if (hit && hit.name == "玩家") hit.GetComponent<Player>().Hit(attack);
     }
 
     /// <summary>
@@ -166,7 +173,7 @@ public class Enemy : MonoBehaviour
     /// <summary>
     /// 死亡
     /// </summary>
-    private void Dead()
+    protected virtual void Dead()
     {
         ani.SetBool("死亡開關", true);
         rig.Sleep();                                            // 剛體 睡著 - 避免飄移
@@ -190,7 +197,7 @@ public class Enemy : MonoBehaviour
     /// 受傷
     /// </summary>
     /// <param name="damage">接收到的傷害</param>
-    public void Hit(float damage)
+    public virtual void Hit(float damage)
     {
         hp -= damage;
 
