@@ -128,7 +128,7 @@ MonoBehaviour:
   attackOffset: {x: 1.2, y: 0.3, z: 0}
   attackSize: {x: 1, y: 2, z: 0.1}
   prop: {fileID: 286721464292635177, guid: bc654fa0fa736ec4aace6206444a99ff, type: 3}
-  propProbility: 1
+  propProbility: 0.5
 --- !u!50 &7268635400810551577
 Rigidbody2D:
   serializedVersion: 4
@@ -159,7 +159,7 @@ CapsuleCollider2D:
   m_GameObject: {fileID: 7268635400810551583}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 527d4d1ffec7eff47b69eda8cad365bd, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0

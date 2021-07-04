@@ -19,6 +19,10 @@ public class MenuManager : MonoBehaviour
         // 場景管理.載入場景("場景名稱")
         SceneManager.LoadScene("遊戲畫面");     // 使用【字串】載入
         // SceneManager.LoadScene(1);          // 使用【編號】載入
+
+        // 讓玩家生命值恢復
+        // 1. 靜態欄位語法：類別名稱.欄位名稱
+        Player.life = 3;
     }
 
     /// <summary>

@@ -29,6 +29,9 @@ public class Player : MonoBehaviour
     // 靜態 static
     // 1. 靜態欄位重新載入後不會還原為預設值
     // 2. 靜態欄位不會顯示在屬性面板上
+    /// <summary>
+    /// 生命值
+    /// </summary>
     public static int life = 3;
 
     private AudioSource aud;
@@ -298,6 +301,8 @@ public class Player : MonoBehaviour
     /// <param name="damage">造成的傷害</param>
     public void Hit(float damage)
     {
+        if (win) return;
+
         hp -= damage;
         imgHp.fillAmount = hp / hpMax;      // 圖片.長度 = 血量 / 血量最大值
 
@@ -316,27 +321,34 @@ public class Player : MonoBehaviour
             ani.SetBool("死亡開關", hp <= 0);
             life--;                             // 生命遞減
             textHp.text = life.ToString();      // 更新生命數量
-            
+
             if (life >= 0) Invoke("Replay", 2f);    // 如果 生命 大於等於 0 就 重新遊戲
             else StartCoroutine(GameOver());        // 否則 就 啟動協同程序 遊戲結束
         }
-        
+
         return hp <= 0;
     }
+
+    private bool win;
 
     // IEnumerator 允許傳回時間 必須有 yield 讓步
     public IEnumerator GameOver(string finalTitle = "GameOver")
     {
-        textFinalTitle.text = finalTitle;
-
-        while (groupFinal.alpha < 1)                    // 當 透明度 < 1 時 執行
+        if (!win)
         {
-            groupFinal.alpha += 0.05f;                  // 遞增透明度 0.05
-            yield return new WaitForSeconds(0.02f);     // 間隔 0.02 秒
-        }
+            if (finalTitle == "You Win!") win = true;
 
-        groupFinal.interactable = true;                 // 允許 互動
-        groupFinal.blocksRaycasts = true;               // 允許 滑鼠遮擋
+            textFinalTitle.text = finalTitle;
+
+            while (groupFinal.alpha < 1)                    // 當 透明度 < 1 時 執行
+            {
+                groupFinal.alpha += 0.05f;                  // 遞增透明度 0.05
+                yield return new WaitForSeconds(0.02f);     // 間隔 0.02 秒
+            }
+
+            groupFinal.interactable = true;                 // 允許 互動
+            groupFinal.blocksRaycasts = true;               // 允許 滑鼠遮擋
+        }
     }
 
     /// <summary>
